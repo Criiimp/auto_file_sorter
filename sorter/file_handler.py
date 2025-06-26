@@ -1,6 +1,6 @@
 #   sorter/file_handler.py
 
-import os, shutil
+import os, shutil, time
 from datetime import datetime
 
 from unicodedata import category
@@ -16,6 +16,14 @@ class FileHandler(FileSystemEventHandler):
 
         f_path = event.src_path
         f_name = os.path.basename(f_path)
+
+        for attempt in range(10):
+            try:
+                with open(f_path, 'rb'):
+                    break
+            except PermissionError:
+                print(f"Waiting for file to be ready: {f_name}")
+                time.sleep(1)
 
         category = get_cat(f_name)
 
